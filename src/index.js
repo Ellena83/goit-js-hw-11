@@ -10,12 +10,6 @@ const galleryRef = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 const endCollectionText = document.querySelector('.end-collection-text');
 
-
-// function renderCardImage(arr) {
-//     const markup = arr.map(item => renderGallery(item)).join('');
-//     galleryRef.insertAdjacentHTML('beforeend', markup);
-// }
-
 let gallery = new SimpleLightbox('.photo-card a', {
     captions: true,
     captionsData: 'alt',
@@ -30,7 +24,7 @@ searchForm.addEventListener('submit', onFormSubmit);
 
 async function onFormSubmit(evt) {
     evt.preventDefault();
-    searchQuery = evt.currentTarget.searchQuery.value;
+    searchQuery = evt.currentTarget.searchQuery.value.trim();
     currentPage = 1;
 
     if (searchQuery === '') {
@@ -39,13 +33,13 @@ async function onFormSubmit(evt) {
 
     const response = await fetchImages(searchQuery, currentPage);
     currentHits = response.hits.length;
-    console.log(currentHits)
+
     if (response.totalHits > 40) {
         loadMoreBtn.classList.remove('is-hidden');
     } else {
         loadMoreBtn.classList.add('is-hidden');
     }
-    console.log(response.totalHits)
+
     try {
         if (response.totalHits > 0) {
             Notify.success(`Hooray! We found ${response.totalHits} images.`);
@@ -114,14 +108,16 @@ async function onFormSubmit(evt) {
 loadMoreBtn.addEventListener('click', onClickLoadMoreBtn);
 
 async function onClickLoadMoreBtn() {
+
     currentPage += 1;
     const response = await fetchImages(searchQuery, currentPage);
     renderGallery(response.hits, galleryRef);
     gallery.refresh();
     currentHits += response.hits.length;
 
-    if (currentHits === response.totalHits) {
+    if (currentHits >= response.totalHits && 460) {
         loadMoreBtn.classList.add('is-hidden');
         endCollectionText.classList.remove('is-hidden');
     }
+
 }
